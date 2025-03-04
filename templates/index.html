@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <!-- 让移动端自适应屏幕宽度 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack (文字版)</title>
+
+  <!-- 引用拆分好的 CSS 文件 -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <h1>Blackjack (文字版)</h1>
+
+
+  <!-- 最外层容器 -->
+  <div class="container">
+    <!-- 登录/加入游戏面板 -->
+    <div id="join-panel" class="panel">
+      <p>请输入你的昵称：</p>
+      <input type="text" id="playerName" placeholder="你的昵称" />
+      <button id="btnJoin">加入游戏</button>
+      <p id="joinMsg" style="color:red; margin-top: 0.5rem;"></p>
+    </div>
+
+    <!-- 游戏面板，进入后才显示 -->
+    <div id="game-panel" class="panel" style="display:none;">
+      <p>你好，<span id="playerInfo"></span>！</p>
+      <button id="btnStart">开始新一轮</button>
+
+      <hr />
+      <h2>玩家操作</h2>
+
+      <div style="margin-bottom: 0.5rem;">
+        <label>普通下注金额:</label>
+        <input type="number" id="betAmount" />
+        <label>压爆:</label>
+        <input type="number" id="sideBetBao" />
+        <label>压对:</label>
+        <input type="number" id="sideBetDui" />
+        <button id="btnBet">下注</button>
+      </div>
+
+      <!-- 操作按钮区 -->
+      <div class="actions">
+        <button id="btnHit">要牌 (Hit)</button>
+        <button id="btnStand">停牌 (Stand)</button>
+        <button id="btnDouble">加倍!!! (Double)</button>
+        <button id="btnSurrender">投降 (Surrender)</button>
+      </div>
+
+      <hr />
+      <div id="gameStateArea"></div>
+    </div>
+  </div>
+
+  <!-- 游戏规则展示区 -->
+  <div class="rules">
+    <h2>游戏规则</h2>
+    <div>对子赔率 1:11</div>
+    <div>压爆赔率 1:2，大于5张赔率 1:4</div>
+    <div>Blackjack 彩金 1:0.5</div>
+  </div>
+
+  <audio id="turnSound" src="/static/sound/drop_cards.mp3" preload="auto"></audio>
+  <!-- 引入 Socket.io 脚本 + main.js -->
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  <script src="/static/main.js"></script>
+</body>
+</html>
