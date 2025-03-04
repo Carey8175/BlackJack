@@ -83,14 +83,6 @@ input[type="number"] {
   display: inline-block;
   margin-top: 0.3rem;
 }
-.card-img {
-  width: 40px;       /* 调小卡牌宽度以适配手机 */
-  height: auto;      /* 保持比例 */
-  margin-right: 3px;
-  margin-bottom: 3px;
-  vertical-align: middle;
-  border-radius: 2px; /* 轻微圆角，可选 */
-}
 
 /* ========== gameStateArea, rules ========== */
 #gameStateArea {
@@ -179,4 +171,88 @@ input[type="number"] {
 .bet-row button {
   padding: 0.5rem 1rem;
   /* 你已有的按钮样式即可，这里可再加点细节 */
+}
+
+.table-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  margin: 0 auto; /* 居中 */
+  border-radius: 50%;
+  background: #0a6522; /* 绿色牌桌 */
+}
+
+/* 每个玩家/庄家的座位 */
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  /* 将其中心对准定位点 */
+  width: 120px;
+  /* 你也可以改大/改小 */
+  text-align: center;
+  color: #fff;
+  /* 在深绿色背景下，白字更明显 */
+}
+
+/* 卡牌图片 */
+.card-img {
+  width: 40px;
+  height: auto;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  vertical-align: middle;
+}
+
+/* 座位容器 */
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff; /* 在绿桌背景下使用白色 */
+  width: 140px; /* 或者你想要的宽度 */
+}
+
+/* 玩家姓名 */
+.seat-name {
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+/* 手牌区域，横排展示 */
+.seat-cards {
+  display: flex;
+  justify-content: center;
+  gap: 4px;       /* 牌与牌之间的间隙 */
+  margin-bottom: 0.4rem;
+}
+
+/* 文字信息，放在一个半透明背景里 */
+.seat-info {
+  background: rgba(0,0,0,0.2); /* 半透明黑底 */
+  border-radius: 4px;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.table-container {
+  position: relative;  /* 必须给父容器 position: relative; */
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #0a6522;  /* 绿色桌布 */
+}
+
+/* 让轮次文字固定在左上角 */
+.round-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #000;           /* 在绿背景下用白字 */
+  font-weight: bold;
+  font-size: 1.1rem;
+  /* 也可加点阴影或背景 */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  /* background: rgba(0,0,0,0.2); padding: 0.3rem; border-radius:4px; */
 }

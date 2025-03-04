@@ -95,11 +95,11 @@ socket.on('game_state', (state) => {
   renderGameState(state);
 });
 
-// ========== 前端渲染核心逻辑 ==========
+// ========== 前端渲染核心逻辑 (环形牌桌) ==========
 
 /**
- * 根据单张牌对象 {rank, suit} 返回 <img> 标记。
- * 若 rank='?'&suit='?' => 显示背面图。
+ * 如果 rank='?' & suit='?' => 显示背面图
+ * 否则映射到 e.g. "AH.png" / "ace_of_hearts.svg" 等
  */
 function getCardImageHtml(card) {
   // 如果是暗牌 => 用 card_back.png
@@ -107,24 +107,20 @@ function getCardImageHtml(card) {
     return `<img src="/static/imgs/cards/card_back.png" class="card-img" />`;
   }
 
-  // 否则映射花色 & 点数到文件名 (如 'A'+'H' => 'AH.png')
+  // 映射
   const suitMap = { '♥':'hearts', '♦':'diamonds', '♣':'clubs', '♠':'spades' };
-  // 可能 rankMap 也要
   const rankMap = { 'A':'ace','K':'king','Q':'queen','J':'jack','10':'10','9':'9','8':'8','7':'7','6':'6','5':'5','4':'4','3':'3','2':'2' };
 
   let suitChar = suitMap[card.suit] || 'X';
   let rankChar = rankMap[card.rank] || card.rank;
 
-  // 拼接文件名 => AH.png / 10S.png
+  // 例如 "ace_of_hearts.svg"
   let fileName = `${rankChar}_of_${suitChar}.svg`;
   let imgPath = `/static/imgs/cards/${fileName}`;
 
   return `<img src="${imgPath}" class="card-img" />`;
 }
 
-/**
- * 把一组 card 对象组合成 HTML (若有多张牌)
- */
 function getCardsHtml(cards) {
   let html = '<div class="cards-container">';
   cards.forEach(c => {
@@ -134,12 +130,6 @@ function getCardsHtml(cards) {
   return html;
 }
 
-/**
- * 真正的渲染函数:
- *  - 控制何时显示庄家暗牌/闲家牌
- *  - 启用/禁用下注 & 操作按钮
- *  - 当轮到自己时播放音效
- */
 function renderGameState(state) {
   // 1) 是否所有闲家都已下注
   const allNonDealerBet = state.players
@@ -151,31 +141,45 @@ function renderGameState(state) {
     .filter(p => !p.isDealer)
     .every(p => p.isStanding || p.isBusted);
 
-  let html = "";
-  html += `<p>第 ${state.roundNumber} 轮游戏</p>`;
-  html += `<p>当前轮到玩家索引: ${state.currentPlayerIndex}</p>`;
-  html += "<hr><ul>";
+  // 准备渲染
+  let seatsHtml = "";
+  const totalPlayers = state.players.length;
 
-  // 遍历每位玩家,拼接HTML
-  state.players.forEach((p, index) => {
-    const dealerTag = p.isDealer ? " [庄家]" : "";
-    const bustedTag = p.isBusted ? " (爆了)" : "";
-    const standingTag = p.isStanding ? " (停牌)" : "";
+  // 找到“自己”在 state.players 里的下标
+  const myIndexInArray = state.players.findIndex(p => p.playerID === currentPlayerID);
+  // 如果没找到，可能还没加入 or 出错
+  // if (myIndexInArray === -1) return;
 
-    // 如果后端给了 p.handValue，就用它; 否则显示 "?"
+  // 圆桌中心 (300, 300), 半径 200 (可调整)
+  const centerX = 300;
+  const centerY = 300;
+  const radius = 200;
+
+  // 遍历 i=0..(n-1)
+  // 让 i=0 => “自己”， i=1 => 自己后面的玩家...
+  // 这样自己就可以固定在 angle = +π/2 => 圆桌正下方
+  for (let i = 0; i < totalPlayers; i++) {
+    // realIndex: 在 players 中的实际下标
+    let realIndex = (i + myIndexInArray) % totalPlayers;
+    let p = state.players[realIndex];
+
+    // 计算角度: i=0 => +π/2 (正下方)
+    // i=1 => +π/2 + 2π / totalPlayers => 顺时针
+    let angle = (2 * Math.PI * i / totalPlayers) + Math.PI/2;
+
+    // 计算座位绝对坐标
+    let x = centerX + radius * Math.cos(angle);
+    let y = centerY + radius * Math.sin(angle);
+
+    // ------ 常规暗牌逻辑 -------
     let displayPoint = (typeof p.handValue !== 'undefined') ? p.handValue : "?";
-
-    // 默认: 显示玩家的实际牌
     let cardsToShow = [...p.hand];
-
     if (!allNonDealerBet) {
-      // 还没人(或有人没)下注 => 全场隐藏
       displayPoint = "??";
-      cardsToShow = cardsToShow.map(() => ({rank:'?', suit:'?'}));
+      cardsToShow = cardsToShow.map(() => ({ rank:'?', suit:'?' }));
     } else {
-      // 大家都下注了
       if (!allNonDealerDone) {
-        // 闲家有人还在打 => 庄家暗牌, 闲家明牌
+        // 闲家有人还在操作 => 庄家暗牌, 闲家明牌
         if (p.isDealer) {
           displayPoint = "??";
           if (p.hand.length >= 2) {
@@ -184,38 +188,66 @@ function renderGameState(state) {
             cardsToShow = [first, ...hiddenRest];
           }
         }
-      } else {
-        // 所有闲家都结束 => 庄家全亮
-        // 不改 cardsToShow
-        // displayPoint = p.handValue
       }
+      // else => 所有闲家都结束 => 庄家全亮
     }
 
     let cardHtml = getCardsHtml(cardsToShow);
 
-    // 拼接玩家信息
-    html += `<li>`;
-    html += `玩家${index}：${p.name}${dealerTag}<br>`;
-    html += `${cardHtml}<br>`;
-    html += `点数=${displayPoint} ${bustedTag} ${standingTag}<br>`;
-    html += `金币：${p.coins}，普通下注：${p.bet}，压爆：${p.sideBetBao}，压对：${p.sideBetDui}`;
-    html += `</li><br>`;
-  });
+    // 爆了/停牌 标识
+    let bustedTag = p.isBusted ? " (爆了)" : "";
+    let standingTag = p.isStanding ? " (停牌)" : "";
 
-  html += "</ul><hr>";
-  gameStateArea.innerHTML = html;
+    // 是否自己
+    let isMe = (p.playerID === currentPlayerID);
 
-  // ========== 启用/禁用下注按钮 ==========
-  if (!allNonDealerBet) {
-    btnBet.disabled = false;  // 还有人没下注 => 可以下注
-  } else {
-    btnBet.disabled = true;   // 大家都下注 => 禁用下注
+    // 如果是庄家 => 名字默认 + [庄家]红色
+    // 如果是自己(且不是庄家) => 名字黄
+    let playerNameHtml = p.isDealer
+      ? `玩家${realIndex}：${p.name} <span style="color:red;">[庄家]</span>`
+      : (isMe
+          ? `<span style="color: yellow;">玩家${realIndex}：${p.name}</span>`
+          : `玩家${realIndex}：${p.name}`);
+
+    seatsHtml += `
+      <div class="seat" style="top:${y}px; left:${x}px;">
+        <div class="seat-name">
+          ${playerNameHtml}
+        </div>
+        <div class="seat-cards">
+          ${cardHtml}
+        </div>
+        <div class="seat-info">
+          <div>点数=${displayPoint} ${bustedTag} ${standingTag}</div>
+          <div>金币：${p.coins}</div>
+          <div>注：${p.bet}，爆：${p.sideBetBao}，对：${p.sideBetDui}</div>
+        </div>
+      </div>
+    `;
   }
 
-  // ========== 控制要牌/停牌按钮 ==========
-  // 找到我是谁
+  // 构造桌子HTML
+  let tableHtml = `
+    <div class="table-container">
+      <div class="round-indicator">第 ${state.roundNumber} 轮</div>
+      ${seatsHtml}
+    </div>
+  `;
+  // 放进 #gameStateArea
+  gameStateArea.innerHTML = tableHtml;
+
+  // ====== 启用/禁用 下注按钮 ======
+  if (!allNonDealerBet) {
+    btnBet.disabled = false;
+  } else {
+    btnBet.disabled = true;
+  }
+
+  // ====== 控制要牌/停牌按钮 ======
+  // (不变)
   const myIndex = state.players.findIndex(p => p.playerID === currentPlayerID);
-  if (myIndex === -1) return; // 没找到自己就不处理
+  if (myIndex === -1) return;
+
   let isMyTurn = false;
   if (myIndex === state.currentPlayerIndex) {
     const me = state.players[myIndex];
@@ -225,7 +257,6 @@ function renderGameState(state) {
   }
 
   if (isMyTurn) {
-    // 启用Hit/Stand/Double/Surrender
     btnHit.disabled = false;
     btnStand.disabled = false;
     btnDouble.disabled = false;
@@ -245,7 +276,6 @@ function renderGameState(state) {
       });
     }
   } else {
-    // 不在我回合 => 禁用
     btnHit.disabled = true;
     btnStand.disabled = true;
     btnDouble.disabled = true;
@@ -257,7 +287,7 @@ function renderGameState(state) {
     btnSurrender.style.backgroundColor = "#ccc";
   }
 
-  // ========== “开始新一轮”按钮（庄家专用） ==========
+  // ====== “开始新一轮”按钮（庄家专用） ======
   const isDealer = (myIndex === state.dealerIndex);
   if (isDealer) {
     btnStart.disabled = false;

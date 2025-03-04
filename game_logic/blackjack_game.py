@@ -14,6 +14,7 @@ class BlackjackGame:
         self.dealer_done = False
         self.phase = 'BETTING'  # 初始阶段为“等待下注”
         self.dealer_can_act = False
+        self.round_settled = False
 
     def add_player(self, player_id, name):
         """
@@ -35,6 +36,7 @@ class BlackjackGame:
         self.round_number += 1
         self.dealer_done = False
         self.dealer_can_act = False
+        self.round_settled = False
 
         # 如果上一轮已经有庄家了，把庄家状态清空
         for p in self.players:
@@ -299,6 +301,8 @@ class BlackjackGame:
             if len(p.hand) == 2 and player_value == 21:
                 p.coins += int(p.bet * 0.5)
                 dealer.coins -= int(p.bet * 0.5)
+
+        self.round_settled = True
 
     def find_player_by_id(self, player_id):
         for p in self.players:

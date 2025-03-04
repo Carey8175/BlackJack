@@ -49,7 +49,9 @@ def on_start_game():
         return
 
     # 结算当前轮次
-    game.settle_bets()
+    if not game.round_settled:
+        game.settle_bets()
+        game.rotate_dealer()
     # 开始新一轮
     game.start_new_round()
     broadcast_game_state()
