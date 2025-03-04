@@ -208,6 +208,11 @@ class BlackjackGame:
         if not player or player.is_busted or player.is_standing:
             return
 
+        # 如果庄家手牌第一张是A，不能投降
+        dealer = self.get_dealer()
+        if dealer.hand[0]['rank'] == 'A':
+            return
+
         # 常见规则：扣掉一半赌注(你也可以收全部一半?)
         # 这里假设 bet 的一半归庄家或房间，剩下的退还给玩家
         if player.bet > 1:
