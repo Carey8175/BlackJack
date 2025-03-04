@@ -56,6 +56,11 @@ def on_start_game():
     game.start_new_round()
     broadcast_game_state()
 
+@socketio.on('reset_game')
+def on_reset_game():
+    game.reset_game()
+    broadcast_game_state()
+
 @socketio.on('place_bet')
 def on_place_bet(data):
     if game.phase != 'BETTING':

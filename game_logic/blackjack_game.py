@@ -26,6 +26,10 @@ class BlackjackGame:
         self.players.append(new_player)
         return new_player
 
+    def reset_game(self):
+        """重新初始化游戏"""
+        self.__init__(max_players=self.max_players, num_decks=4)
+
     def start_new_round(self):
         """
         开始新的牌局：

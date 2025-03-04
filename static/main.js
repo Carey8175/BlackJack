@@ -19,6 +19,7 @@ const btnHit = document.getElementById('btnHit');
 const btnStand = document.getElementById('btnStand');
 const btnDouble = document.getElementById('btnDouble');
 const btnSurrender = document.getElementById('btnSurrender');
+const btnReset = document.getElementById('btnReset');
 
 // ========== 事件监听 ==========
 
@@ -35,6 +36,11 @@ btnJoin.addEventListener('click', () => {
 // 开始新一轮
 btnStart.addEventListener('click', () => {
   socket.emit('start_game');
+});
+
+// 重置游戏
+btnReset.addEventListener('click', () => {
+  socket.emit('reset_game');
 });
 
 // 下注
@@ -208,10 +214,10 @@ function renderGameState(state) {
 
     // 如果庄家 => [庄家]红, 自己=>黄
     let playerNameHtml = p.isDealer
-      ? `玩家${realIndex}：${p.name} <span style="color:red;">[庄家]</span>`
+      ? `${p.name} <span style="color:red;">[庄家]</span>`
       : (isMe
           ? `<span style="color: yellow;">玩家${realIndex}：${p.name}</span>`
-          : `玩家${realIndex}：${p.name}`);
+          : `${p.name}`);
 
     seatsHtml += `
       <div class="seat"
