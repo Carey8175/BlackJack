@@ -206,10 +206,11 @@ class BlackjackGame:
 
         # 常见规则：扣掉一半赌注(你也可以收全部一半?)
         # 这里假设 bet 的一半归庄家或房间，剩下的退还给玩家
-        half_bet = player.bet // 2
-        # 退还另外一半
-        player.coins += (player.bet - half_bet)
-        player.bet = half_bet
+        if player.bet > 1:
+            half_bet = player.bet // 2
+            # 退还另外一半
+            player.coins += half_bet
+            player.bet -= half_bet
 
         player.is_busted = True
 
