@@ -95,29 +95,23 @@ socket.on('game_state', (state) => {
   renderGameState(state);
 });
 
-// ========== 前端渲染核心逻辑 (环形牌桌) ==========
-
 /**
- * 如果 rank='?' & suit='?' => 显示背面图
- * 否则映射到 e.g. "AH.png" / "ace_of_hearts.svg" 等
+ * 若 rank='?' & suit='?' => card_back
+ * 否则 "ace_of_hearts.svg" 之类
  */
 function getCardImageHtml(card) {
-  // 如果是暗牌 => 用 card_back.png
   if (card.rank === '?' && card.suit === '?') {
     return `<img src="/static/imgs/cards/card_back.png" class="card-img" />`;
   }
-
-  // 映射
   const suitMap = { '♥':'hearts', '♦':'diamonds', '♣':'clubs', '♠':'spades' };
-  const rankMap = { 'A':'ace','K':'king','Q':'queen','J':'jack','10':'10','9':'9','8':'8','7':'7','6':'6','5':'5','4':'4','3':'3','2':'2' };
-
+  const rankMap = {
+    'A':'ace','K':'king','Q':'queen','J':'jack',
+    '10':'10','9':'9','8':'8','7':'7','6':'6','5':'5','4':'4','3':'3','2':'2'
+  };
   let suitChar = suitMap[card.suit] || 'X';
   let rankChar = rankMap[card.rank] || card.rank;
-
-  // 例如 "ace_of_hearts.svg"
   let fileName = `${rankChar}_of_${suitChar}.svg`;
   let imgPath = `/static/imgs/cards/${fileName}`;
-
   return `<img src="${imgPath}" class="card-img" />`;
 }
 
@@ -130,79 +124,89 @@ function getCardsHtml(cards) {
   return html;
 }
 
+/**
+ * 主渲染函数:
+ *  1. 背景: #gameStateArea 全绿
+ *  2. 动态计算 #gameStateArea 大小 => radius
+ *  3. 座位固定大小(宽=140,高=180), 让文字不会把座位变大
+ *  4. radius = (tableWidth/2 - seatHalfW, tableHeight/2 - seatHalfH)
+ *  5. 自己在下方, 其余顺时针
+ */
 function renderGameState(state) {
-  // 1) 是否所有闲家都已下注
+  // 是否都下注
   const allNonDealerBet = state.players
     .filter(p => !p.isDealer)
     .every(p => p.bet > 0);
 
-  // 2) 是否所有闲家都已停牌或爆牌
+  // 是否都结束
   const allNonDealerDone = state.players
     .filter(p => !p.isDealer)
     .every(p => p.isStanding || p.isBusted);
 
-  // 准备渲染
+  // 清空旧
+  gameStateArea.innerHTML = "";
+
+  // 量一下 #gameStateArea 的大小
+  const rect = gameStateArea.getBoundingClientRect();
+  let tableWidth = rect.width;
+  let tableHeight = rect.height;
+  if (tableWidth < 50) tableWidth = 600;
+  if (tableHeight < 50) tableHeight = 600;
+
+  // 座位固定大小
+  const seatW = 140;
+  const seatH = 180;
+  const seatHalfW = seatW / 2;
+  const seatHalfH = seatH / 2;
+
+  // radius = min(tableWidth/2 - seatHalfW, tableHeight/2 - seatHalfH)
+  const radius = Math.min(tableWidth/2 - seatHalfW, tableHeight/2 - seatHalfH);
+
+  const centerX = tableWidth / 2;
+  const centerY = tableHeight / 2;
+
   let seatsHtml = "";
   const totalPlayers = state.players.length;
 
-  // 找到“自己”在 state.players 里的下标
+  // 找到自己 => i=0 => +π/2
   const myIndexInArray = state.players.findIndex(p => p.playerID === currentPlayerID);
-  // 如果没找到，可能还没加入 or 出错
-  // if (myIndexInArray === -1) return;
 
-  // 圆桌中心 (300, 300), 半径 200 (可调整)
-  const centerX = 300;
-  const centerY = 300;
-  const radius = 200;
-
-  // 遍历 i=0..(n-1)
-  // 让 i=0 => “自己”， i=1 => 自己后面的玩家...
-  // 这样自己就可以固定在 angle = +π/2 => 圆桌正下方
   for (let i = 0; i < totalPlayers; i++) {
-    // realIndex: 在 players 中的实际下标
     let realIndex = (i + myIndexInArray) % totalPlayers;
     let p = state.players[realIndex];
 
-    // 计算角度: i=0 => +π/2 (正下方)
-    // i=1 => +π/2 + 2π / totalPlayers => 顺时针
+    // i=0 => 下方 => +π/2
     let angle = (2 * Math.PI * i / totalPlayers) + Math.PI/2;
 
-    // 计算座位绝对坐标
     let x = centerX + radius * Math.cos(angle);
     let y = centerY + radius * Math.sin(angle);
 
-    // ------ 常规暗牌逻辑 -------
+    // 暗牌
     let displayPoint = (typeof p.handValue !== 'undefined') ? p.handValue : "?";
     let cardsToShow = [...p.hand];
     if (!allNonDealerBet) {
       displayPoint = "??";
       cardsToShow = cardsToShow.map(() => ({ rank:'?', suit:'?' }));
     } else {
-      if (!allNonDealerDone) {
-        // 闲家有人还在操作 => 庄家暗牌, 闲家明牌
-        if (p.isDealer) {
-          displayPoint = "??";
-          if (p.hand.length >= 2) {
-            let first = p.hand[0];
-            let hiddenRest = p.hand.slice(1).map(() => ({ rank:'?', suit:'?' }));
-            cardsToShow = [first, ...hiddenRest];
-          }
+      if (!allNonDealerDone && p.isDealer) {
+        displayPoint = "??";
+        if (p.hand.length >= 2) {
+          let first = p.hand[0];
+          let hiddenRest = p.hand.slice(1).map(() => ({ rank:'?', suit:'?' }));
+          cardsToShow = [first, ...hiddenRest];
         }
       }
-      // else => 所有闲家都结束 => 庄家全亮
     }
-
     let cardHtml = getCardsHtml(cardsToShow);
 
-    // 爆了/停牌 标识
+    // 爆/停
     let bustedTag = p.isBusted ? " (爆了)" : "";
     let standingTag = p.isStanding ? " (停牌)" : "";
 
     // 是否自己
     let isMe = (p.playerID === currentPlayerID);
 
-    // 如果是庄家 => 名字默认 + [庄家]红色
-    // 如果是自己(且不是庄家) => 名字黄
+    // 如果庄家 => [庄家]红, 自己=>黄
     let playerNameHtml = p.isDealer
       ? `玩家${realIndex}：${p.name} <span style="color:red;">[庄家]</span>`
       : (isMe
@@ -210,7 +214,11 @@ function renderGameState(state) {
           : `玩家${realIndex}：${p.name}`);
 
     seatsHtml += `
-      <div class="seat" style="top:${y}px; left:${x}px;">
+      <div class="seat"
+           style="
+             top:${y}px; left:${x}px;
+             width:${seatW}px; height:${seatH}px;
+           ">
         <div class="seat-name">
           ${playerNameHtml}
         </div>
@@ -226,25 +234,23 @@ function renderGameState(state) {
     `;
   }
 
-  // 构造桌子HTML
-  let tableHtml = `
-    <div class="table-container">
+  // 生成 table-area + roundIndicator
+  const tableHtml = `
+    <div class="table-area" style="position: relative; width:100%; height:100%;">
       <div class="round-indicator">第 ${state.roundNumber} 轮</div>
       ${seatsHtml}
     </div>
   `;
-  // 放进 #gameStateArea
   gameStateArea.innerHTML = tableHtml;
 
-  // ====== 启用/禁用 下注按钮 ======
+  // ========== 启用/禁用下注按钮 ==========
   if (!allNonDealerBet) {
     btnBet.disabled = false;
   } else {
     btnBet.disabled = true;
   }
 
-  // ====== 控制要牌/停牌按钮 ======
-  // (不变)
+  // ========== 控制要牌/停牌按钮 ==========
   const myIndex = state.players.findIndex(p => p.playerID === currentPlayerID);
   if (myIndex === -1) return;
 
@@ -287,7 +293,7 @@ function renderGameState(state) {
     btnSurrender.style.backgroundColor = "#ccc";
   }
 
-  // ====== “开始新一轮”按钮（庄家专用） ======
+  // ========== “开始新一轮”按钮（庄家专用） ==========
   const isDealer = (myIndex === state.dealerIndex);
   if (isDealer) {
     btnStart.disabled = false;

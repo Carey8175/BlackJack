@@ -1,11 +1,9 @@
 /* ========== 基础排版与布局 ========== */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  margin: 0; padding: 0; box-sizing: border-box;
 }
 
-/* 淡淡渐变背景，可选 */
+/* 背景渐变(上灰下白) */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: linear-gradient(to bottom, #f7f7f7, #ffffff 80%);
@@ -14,7 +12,6 @@ body {
   padding: 1rem;
 }
 
-/* 容器：白色卡片风格，带阴影与圆角 */
 .container {
   max-width: 650px;
   margin: 0 auto 1rem auto;
@@ -24,18 +21,10 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* 面板与内部间距 */
 .panel {
   margin-bottom: 1rem;
 }
 
-/* 面板标题 */
-.panel h2 {
-  margin-bottom: 0.5rem;
-  color: #444;
-}
-
-/* 按钮区：让按钮可换行 */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -43,7 +32,7 @@ body {
   margin-top: 0.5rem;
 }
 
-/* ========== 按钮样式 ========== */
+/* 按钮 */
 button {
   cursor: pointer;
   padding: 0.6rem 1.2rem;
@@ -67,7 +56,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* ========== 输入框样式 ========== */
+/* 输入框 */
 input[type="text"],
 input[type="number"] {
   padding: 0.5rem;
@@ -78,59 +67,77 @@ input[type="number"] {
   font-size: 1rem;
 }
 
-/* ========== 卡牌容器 & 卡牌图片 ========== */
-.cards-container {
-  display: inline-block;
-  margin-top: 0.3rem;
-}
-
-/* ========== gameStateArea, rules ========== */
+/* gameStateArea => 整个绿色背景 */
 #gameStateArea {
-  background: #fafafa;
-  border: 1px solid #ddd;
-  padding: 0.6rem;
-  min-height: 100px;
-  margin-top: 0.5rem;
-  border-radius: 4px;
-}
-#gameStateArea ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 0.5rem;
-}
-#gameStateArea li {
-  margin-bottom: 0.5rem;
-}
-
-/* 游戏规则区，类似容器风格 */
-.rules {
-  max-width: 650px;
-  margin: 0 auto;
-  background: #fff;
+  position: relative;
+  min-height: 600px;
+  background: #0a6522; /* 绿色 */
   border-radius: 8px;
-  padding: 1.2rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow: hidden;  /* 裁剪溢出 */
+  margin-top: 1rem;
 }
-.rules h2 {
-  margin-bottom: 0.5rem;
-  color: #444;
+
+/* 轮次提示 */
+.round-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #000;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
 }
-.rules div {
-  margin: 0.3rem 0;
+
+/* 座位 seat => 固定宽高, 超出滚动 */
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+
+  /* 固定大小, 超出滚动 */
+  width: 140px;
+  height: 180px;
+  overflow: auto;
+  padding: 0.3rem;
+}
+
+.seat-name {
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+.seat-cards {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 0.4rem;
+}
+
+.seat-info {
+  font-size: 0.9rem;
   line-height: 1.4;
+  /* 如果文本多，会出现滚动条 */
 }
 
-/* 小标题或段落间的留白 */
-.rules p, .panel p {
-  margin-bottom: 0.5rem;
+/* 卡牌 */
+.card-img {
+  width: 40px;
+  height: auto;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  vertical-align: middle;
 }
 
-/* ========== 移动端适配 ========== */
+/* 移动端适配 */
 @media (max-width: 480px) {
   body {
     padding: 0.5rem;
   }
-  .container, .rules {
+  .container {
     padding: 0.8rem;
   }
   input[type="number"], input[type="text"] {
@@ -144,115 +151,18 @@ input[type="number"] {
   .actions {
     gap: 0.4rem;
   }
-  .card-img {
-    width: 36px; /* 在更小屏幕再缩一点 */
+
+  #gameStateArea {
+    min-height: 450px;
   }
-}
 
-.bet-row {
-  display: flex;            /* 让其成为flex容器 */
-  flex-wrap: wrap;          /* 小屏可自动换行 */
-  gap: 0.5rem;              /* 元素之间的空隙 */
-  align-items: center;      /* 垂直居中对齐 */
-  margin-bottom: 0.5rem;    /* 与下方区域留点间距 */
-}
-
-.bet-row label {
-  white-space: nowrap;      /* 避免标签换行 */
-  font-weight: 500;         /* 标签稍微醒目些，可选 */
-}
-
-.bet-row input {
-  width: 80px;              /* 控制输入框宽度 */
-  flex: 0 0 auto;           /* 不要它自动伸缩 */
-  margin-right: 0.3rem;     /* 标签和输入之间的小留白 */
-}
-
-.bet-row button {
-  padding: 0.5rem 1rem;
-  /* 你已有的按钮样式即可，这里可再加点细节 */
-}
-
-.table-container {
-  position: relative;
-  width: 600px;
-  height: 600px;
-  margin: 0 auto; /* 居中 */
-  border-radius: 50%;
-  background: #0a6522; /* 绿色牌桌 */
-}
-
-/* 每个玩家/庄家的座位 */
-.seat {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  /* 将其中心对准定位点 */
-  width: 120px;
-  /* 你也可以改大/改小 */
-  text-align: center;
-  color: #fff;
-  /* 在深绿色背景下，白字更明显 */
-}
-
-/* 卡牌图片 */
-.card-img {
-  width: 40px;
-  height: auto;
-  margin-right: 3px;
-  margin-bottom: 3px;
-  vertical-align: middle;
-}
-
-/* 座位容器 */
-.seat {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #fff; /* 在绿桌背景下使用白色 */
-  width: 140px; /* 或者你想要的宽度 */
-}
-
-/* 玩家姓名 */
-.seat-name {
-  font-weight: bold;
-  margin-bottom: 0.4rem;
-}
-
-/* 手牌区域，横排展示 */
-.seat-cards {
-  display: flex;
-  justify-content: center;
-  gap: 4px;       /* 牌与牌之间的间隙 */
-  margin-bottom: 0.4rem;
-}
-
-/* 文字信息，放在一个半透明背景里 */
-.seat-info {
-  background: rgba(0,0,0,0.2); /* 半透明黑底 */
-  border-radius: 4px;
-  padding: 0.4rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.table-container {
-  position: relative;  /* 必须给父容器 position: relative; */
-  width: 600px;
-  height: 600px;
-  margin: 0 auto;
-  border-radius: 50%;
-  background: #0a6522;  /* 绿色桌布 */
-}
-
-/* 让轮次文字固定在左上角 */
-.round-indicator {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: #000;           /* 在绿背景下用白字 */
-  font-weight: bold;
-  font-size: 1.1rem;
-  /* 也可加点阴影或背景 */
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-  /* background: rgba(0,0,0,0.2); padding: 0.3rem; border-radius:4px; */
+  /* 座位再小一点 */
+  .seat {
+    width: 60px;
+    height: 80px;
+    padding: 0.2rem;
+  }
+  .card-img {
+    width: 28px;
+  }
 }
