@@ -1,0 +1,182 @@
+/* ========== 基础排版与布局 ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 淡淡渐变背景，可选 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(to bottom, #f7f7f7, #ffffff 80%);
+  color: #333;
+  line-height: 1.5;
+  padding: 1rem;
+}
+
+/* 容器：白色卡片风格，带阴影与圆角 */
+.container {
+  max-width: 650px;
+  margin: 0 auto 1rem auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* 面板与内部间距 */
+.panel {
+  margin-bottom: 1rem;
+}
+
+/* 面板标题 */
+.panel h2 {
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+/* 按钮区：让按钮可换行 */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ========== 按钮样式 ========== */
+button {
+  cursor: pointer;
+  padding: 0.6rem 1.2rem;
+  margin: 0.3rem 0;
+  border: none;
+  border-radius: 4px;
+  background: #007BFF;
+  color: #fff;
+  transition: background 0.3s, transform 0.1s;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+button:hover {
+  background: #0056b3;
+}
+button:active {
+  transform: scale(0.98);
+}
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* ========== 输入框样式 ========== */
+input[type="text"],
+input[type="number"] {
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* ========== 卡牌容器 & 卡牌图片 ========== */
+.cards-container {
+  display: inline-block;
+  margin-top: 0.3rem;
+}
+.card-img {
+  width: 40px;       /* 调小卡牌宽度以适配手机 */
+  height: auto;      /* 保持比例 */
+  margin-right: 3px;
+  margin-bottom: 3px;
+  vertical-align: middle;
+  border-radius: 2px; /* 轻微圆角，可选 */
+}
+
+/* ========== gameStateArea, rules ========== */
+#gameStateArea {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 0.6rem;
+  min-height: 100px;
+  margin-top: 0.5rem;
+  border-radius: 4px;
+}
+#gameStateArea ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+#gameStateArea li {
+  margin-bottom: 0.5rem;
+}
+
+/* 游戏规则区，类似容器风格 */
+.rules {
+  max-width: 650px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.rules h2 {
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+.rules div {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+}
+
+/* 小标题或段落间的留白 */
+.rules p, .panel p {
+  margin-bottom: 0.5rem;
+}
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+  }
+  .container, .rules {
+    padding: 0.8rem;
+  }
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    margin-right: 0;
+  }
+  button {
+    width: 100%;
+    margin: 0.2rem 0;
+  }
+  .actions {
+    gap: 0.4rem;
+  }
+  .card-img {
+    width: 36px; /* 在更小屏幕再缩一点 */
+  }
+}
+
+.bet-row {
+  display: flex;            /* 让其成为flex容器 */
+  flex-wrap: wrap;          /* 小屏可自动换行 */
+  gap: 0.5rem;              /* 元素之间的空隙 */
+  align-items: center;      /* 垂直居中对齐 */
+  margin-bottom: 0.5rem;    /* 与下方区域留点间距 */
+}
+
+.bet-row label {
+  white-space: nowrap;      /* 避免标签换行 */
+  font-weight: 500;         /* 标签稍微醒目些，可选 */
+}
+
+.bet-row input {
+  width: 80px;              /* 控制输入框宽度 */
+  flex: 0 0 auto;           /* 不要它自动伸缩 */
+  margin-right: 0.3rem;     /* 标签和输入之间的小留白 */
+}
+
+.bet-row button {
+  padding: 0.5rem 1rem;
+  /* 你已有的按钮样式即可，这里可再加点细节 */
+}
