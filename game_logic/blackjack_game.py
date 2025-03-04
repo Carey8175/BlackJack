@@ -288,6 +288,8 @@ class BlackjackGame:
                 if len(p.hand) >= 2 and first_rank == second_rank:
                     p.coins += p.side_bet_dui * 11
                     dealer.coins -= 10 * p.side_bet_dui
+                else:
+                    dealer.coins += p.side_bet_dui
 
             # “压爆”示例：如果庄家爆牌就赢
             if p.side_bet_bao > 0:
@@ -304,8 +306,14 @@ class BlackjackGame:
 
             # 黑杰克1.5倍赔率
             if len(p.hand) == 2 and player_value == 21:
-                p.coins += int(p.bet * 0.5)
-                dealer.coins -= int(p.bet * 0.5)
+                # 庄家也是黑杰克，平局
+                if len(dealer.hand) == 2 and dealer_value == 21:
+                    pass
+                # 庄家不是黑杰克，赢1.5倍，但是庄家是21点，在之前的逻辑中会平平局，但是其实是玩家赢，所以给玩家补偿
+                elif dealer_value == 21:
+                    p.coins += int(p.bet * 1.5)
+                else:
+                    p.coins += int(p.bet * 0.5)
 
         self.round_settled = True
 
