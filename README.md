@@ -1,6 +1,6 @@
 # 🃏 Blackjack 在线游戏（仅供学习用途）
 
-[English Version](#-blackjack-online-game-for-learning-purposes)
+[English Version](README_EN.md)
 
 本项目是一个多人在线 **Blackjack（21点）** 游戏，基于 **Flask + Socket.IO + JavaScript** 实现。支持实时多人交互、下注、庄家自动换位、特殊边注（压爆、压对）等功能。
 
