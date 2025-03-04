@@ -317,6 +317,7 @@ class BlackjackGame:
                 # 庄家不是黑杰克，赢1.5倍，但是庄家是21点，在之前的逻辑中会平平局，但是其实是玩家赢，所以给玩家补偿
                 elif dealer_value == 21:
                     p.coins += int(p.bet * 1.5)
+                    dealer.coins -= int(p.bet * 1.5)
                 else:
                     p.coins += int(p.bet * 0.5)
 
