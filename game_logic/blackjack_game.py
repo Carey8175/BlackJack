@@ -320,6 +320,7 @@ class BlackjackGame:
                     dealer.coins -= int(p.bet * 1.5)
                 else:
                     p.coins += int(p.bet * 0.5)
+                    dealer.coins -= int(p.bet * 0.5)
 
         self.round_settled = True
 
