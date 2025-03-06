@@ -26,34 +26,36 @@
 
     <!-- 游戏面板，进入后才显示 -->
     <div id="game-panel" class="panel" style="display:none;">
-      <p>你好，<span id="playerInfo"></span>！</p>
-
       <div id="gameStateArea"></div>
 
       <button id="btnStart">开始新一轮</button>
 
-      <div class="bet-row">
-        <label>普通下注金额:</label>
-        <input type="number" id="betAmount" />
+      <div class="bet-actions-container">
+        <!-- 下注金额滑动条 -->
+        <div class="bet-row">
+            <label>普通下注金额:</label>
+            <input type="range" id="betAmount" min="2" max="100" step="1" value="2" oninput="updateValue('betAmount')">
+            <span id="betAmountValue">100</span>
 
-        <label>压爆:</label>
-        <input type="number" id="sideBetBao" />
+            <label>压爆:</label>
+            <input type="range" id="sideBetBao" min="0" max="100" step="1" value="0" oninput="updateValue('sideBetBao')">
+            <span id="sideBetBaoValue">50</span>
 
-        <label>压对:</label>
-        <input type="number" id="sideBetDui" />
+            <label>压对:</label>
+            <input type="range" id="sideBetDui" min="0" max="100" step="1" value="0" oninput="updateValue('sideBetDui')">
+            <span id="sideBetDuiValue">50</span>
 
-        <button id="btnBet">下注</button>
-      </div>
+            <button id="btnBet">下注</button>
+        </div>
 
-      <!-- 操作按钮区 -->
-      <div class="actions">
-        <button id="btnHit">要牌 (Hit)</button>
-        <button id="btnStand">停牌 (Stand)</button>
-        <button id="btnDouble">加倍!!! (Double)</button>
-        <button id="btnSurrender">投降 (Surrender)</button>
-        <button id="btnReset">重置（重启整个游戏）</button>
-      </div>
-
+        <!-- 操作按钮 -->
+        <div class="actions">
+            <button id="btnHit">要牌 (Hit)</button>
+            <button id="btnStand">停牌 (Stand)</button>
+            <button id="btnDouble">加倍!!! (Double)</button>
+            <button id="btnSurrender">投降 (Surrender)</button>
+            <button id="btnReset">重置（重启整个游戏）</button>
+        </div>
     </div>
   </div>
 
@@ -69,5 +71,11 @@
   <!-- 引入 Socket.io 脚本 + main.js -->
   <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
   <script src="/static/main.js"></script>
+  <script>
+  function updateValue(id) {
+      document.getElementById(id + "Value").textContent = document.getElementById(id).value;
+  }
+  </script>
+
 </body>
 </html>

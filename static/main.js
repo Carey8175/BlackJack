@@ -234,7 +234,7 @@ function renderGameState(state) {
         <div class="seat-info">
           <div>点数=${displayPoint} <span style="color: red">${bustedTag}</span> <span style="color: yellow"> ${standingTag}</span></div>
           <div>金币：${p.coins}</div>
-          <div>注：${p.bet}，爆：${p.sideBetBao}，对：${p.sideBetDui}</div>
+          <div>注:${p.bet} 爆:${p.sideBetBao} 对:${p.sideBetDui}</div>
         </div>
       </div>
     `;

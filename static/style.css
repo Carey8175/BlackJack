@@ -17,7 +17,7 @@ body {
   margin: 0 auto 1rem auto;
   background: #fff;
   border-radius: 8px;
-  padding: 1.2rem;
+  /*padding: 5px;*/
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
@@ -125,7 +125,7 @@ input[type="number"] {
 
 /* 卡牌 */
 .card-img {
-  width: 40px;
+  width: 50px;
   height: auto;
   margin-right: 3px;
   margin-bottom: 3px;
@@ -138,7 +138,7 @@ input[type="number"] {
     padding: 0.5rem;
   }
   .container {
-    padding: 0.8rem;
+    padding: 5px;
   }
   input[type="number"], input[type="text"] {
     width: 100%;
@@ -153,16 +153,115 @@ input[type="number"] {
   }
 
   #gameStateArea {
-    min-height: 450px;
+    min-height: 500px;
   }
 
   /* 座位再小一点 */
   .seat {
-    width: 60px;
+    width: 70px;
     height: 80px;
     padding: 0.2rem;
   }
   .card-img {
-    width: 35px;
+    width: 50px;
   }
+}
+
+/*.container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*    gap: 20px;*/
+/*    padding: 20px;*/
+/*}*/
+
+.panel {
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+/* 下注区域和操作按钮并排 */
+.bet-actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* 下注区域 */
+.bet-row {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+/* 每个下注滑块样式 */
+.bet-row label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.bet-row input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.bet-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.bet-row input[type="range"]::-webkit-slider-thumb:hover {
+    background: #ff4040;
+}
+
+.bet-row span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #444;
+}
+
+/* 操作按钮区域 */
+.actions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.actions button {
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.actions button:hover {
+    background: #43a047;
 }
